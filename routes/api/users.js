@@ -4,6 +4,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const {User}= require('../../models/user');
 const passport = require('passport');
+const {au}= require('../../middleware/au')
 // router.get('/',(req,res)=>{
 //     res.status(200).json({
 //         massage: "Hello World"
@@ -16,7 +17,7 @@ const passport = require('passport');
 
 router.post('/register',( req,res)=>{
     // console.log(User);
-    const{email, password,fullName, phone, dateOfBirth} = req.body;
+    const{email, password,fullName, phone, dateOfBirth, userType} = req.body;
     User.findOne({$or: [{email},{phone}]})
         .then(user=>{
         //user exist
@@ -26,7 +27,7 @@ router.post('/register',( req,res)=>{
 
         //user not exist
         const newUser= new User({
-            email, password,fullName, phone, dateOfBirth
+            email, password,fullName, phone, dateOfBirth, userType
         })
 
         bcrypt.genSalt(10, (err,salt)=>{
@@ -70,7 +71,7 @@ router.post('/login',(req,res)=>{
                     }
                     jwt.sign(
                         payload,
-                        'doremon',
+                        process.env.SECRET_KEY,
                         {expiresIn: '1h'},
                         (err,token)=>{
                             if(err) res.status(400).json({err: "err"}) 
@@ -100,6 +101,14 @@ router.get('/test', (req,res,next)=>{
 // test- current
 router.get('/test-private',
     passport.authenticate('jwt',{session: false}),
+    // (req,res,next)=>{
+    //     if(req.user.userType==='passenger'){
+    //         next()
+    //     }else{
+    //         res.status(400).json('you do not have permission')
+    //     }
+    // },
+    au('passenger'),
     (req,res)=>{
         res.json({msg:'success'})
     }

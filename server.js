@@ -2,17 +2,20 @@
 const express = require('express');
 const mongoose= require('mongoose');
 const passport= require('passport');
+require('dotenv').config()
 /* project packages */
 /*Connect DB*/
-mongoose.connect('mongodb://localhost:27017/fs03-xedike',{useNewUrlParser:true})
+mongoose.connect(process.env.MONGO_URI,{useNewUrlParser:true})
     .then(console.log("Connected to DB"))
     .catch(console.log)
 /* initialize server */
 const app= express();
 
+
 /* middlewares */
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
+//passport
 app.use(passport.initialize());
 require('./config/passport')(passport);
 //router

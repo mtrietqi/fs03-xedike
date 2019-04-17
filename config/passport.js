@@ -3,7 +3,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const { User } = require('../models/user');
 var opts = {}
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = 'doremon';
+opts.secretOrKey = process.env.SECRET_KEY;
 
 module.exports = (passport) => {
     passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
